@@ -9,7 +9,7 @@
             android:layout_height="match_parent"
             android:background="#0099cc">
 
-            <com.huzefa.boldirect.CustomWebView
+            <com.boldirect.android.CustomWebView
                 android:id="@+id/webview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

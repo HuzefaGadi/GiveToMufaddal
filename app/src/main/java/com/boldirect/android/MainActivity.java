@@ -1,8 +1,9 @@
-package com.huzefa.boldirect;
+package com.boldirect.android;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -12,8 +13,13 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.webkit.CookieManager;
 import android.webkit.GeolocationPermissions;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
+import android.widget.Toast;
+
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.io.IOException;
 
@@ -24,8 +30,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends Activity implements CustomWebView.Listener {
     private String url = "https://app.boldirect.com";
+    //private String url = "https://mobile-test.boldirect.com";
     private CustomWebView mWebView;
     RestApi restApi;
+    //qr code scanner object
+    private IntentIntegrator qrScan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +46,14 @@ public class MainActivity extends Activity implements CustomWebView.Listener {
                 .build();
 
         restApi = retrofit.create(RestApi.class);
-
+        qrScan = new IntentIntegrator(this);
         mWebView = (CustomWebView) findViewById(R.id.webview);
         mWebView.setListener(this, this);
         mWebView.loadUrl(url);
         mWebView.getSettings().setGeolocationEnabled(true);
         mWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        mWebView.getSettings().setJavaScriptEnabled(true);
+        mWebView.addJavascriptInterface(new WebViewJavaScriptInterface(this), "app");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ActivityCompat.requestPermissions(this, new String[]{
@@ -86,7 +97,17 @@ public class MainActivity extends Activity implements CustomWebView.Listener {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        mWebView.onActivityResult(requestCode, resultCode, intent);
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if (result != null) {
+            //if qrcode has nothing in it
+            if (result.getContents() == null) {
+                Toast.makeText(this, "Result Not Found", Toast.LENGTH_LONG).show();
+            } else {
+                mWebView.loadUrl("javascript:loadData('" + result.getContents() + "')");
+            }
+        } else {
+            mWebView.onActivityResult(requestCode, resultCode, intent);
+        }
         // ...
     }
 
@@ -102,13 +123,22 @@ public class MainActivity extends Activity implements CustomWebView.Listener {
 
     @Override
     public void onPageStarted(String url, Bitmap favicon) {
-
+        mWebView.loadUrl("javascript:function loadData(str) { var element = document.getElementById('addBarcodeField');" +
+                "element.value = \" \"; \n" +
+                "element.value = str; \n" +
+                "element.onchange(); } ");
+        mWebView.loadUrl("javascript:function scanBarcode() { app.scanBarcode(); } ");
     }
 
     @Override
     public void onPageFinished(String url) {
+        mWebView.loadUrl("javascript:function loadData(str) { var element = document.getElementById('addBarcodeField');" +
+                "element.value = \" \"; \n" +
+                "element.value = str; \n" +
+                "element.onchange(); } ");
+        mWebView.loadUrl("javascript:function scanBarcode() { app.scanBarcode(); } ");
         String authCode = getCookie("https://app.boldirect.com", "BOL-auth");
-        if(authCode!=null) {
+        if (authCode != null) {
             new BackgroundService().execute(authCode);
         }
     }
@@ -179,6 +209,31 @@ public class MainActivity extends Activity implements CustomWebView.Listener {
             return CookieValue;
         }
         return null;
+    }
+
+    /*
+     * JavaScript Interface. Web code can access methods in here
+     * (as long as they have the @JavascriptInterface annotation)
+     */
+    public class WebViewJavaScriptInterface {
+
+        private Context context;
+
+        /*
+         * Need a reference to the context in order to sent a post message
+         */
+        public WebViewJavaScriptInterface(Context context) {
+            this.context = context;
+        }
+
+        /*
+         * This method can be called from Android. @JavascriptInterface
+         * required after SDK version 17.
+         */
+        @JavascriptInterface
+        public void scanBarcode() {
+            qrScan.initiateScan();
+        }
     }
 }
 /*

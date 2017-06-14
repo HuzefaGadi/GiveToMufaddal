@@ -1,10 +1,4 @@
-package com.huzefa.boldirect;
-
-/*
- * Android-AdvancedWebView (https://github.com/delight-im/Android-AdvancedWebView)
- * Copyright (c) delight.im (https://www.delight.im/)
- * Licensed under the MIT License (https://opensource.org/licenses/MIT)
- */
+package com.boldirect.android;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -14,9 +8,6 @@ import android.app.Fragment;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
@@ -52,14 +43,9 @@ import android.webkit.WebViewClient;
 
 import com.google.gson.Gson;
 
-import org.json.JSONObject;
-
 import java.io.File;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -67,8 +53,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-
-import static com.huzefa.boldirect.Utility.getSharedPreferences;
 
 /**
  * Advanced WebView component for Android that works as intended out of the box

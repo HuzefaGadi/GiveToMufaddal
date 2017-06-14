@@ -1,4 +1,4 @@
-package com.huzefa.boldirect;
+package com.boldirect.android;
 
 /**
  * Created by Rashida on 28/05/17.

@@ -1,4 +1,4 @@
-package com.huzefa.boldirect;
+package com.boldirect.android;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
