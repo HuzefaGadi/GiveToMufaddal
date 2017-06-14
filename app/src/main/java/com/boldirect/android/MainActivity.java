@@ -126,16 +126,16 @@ public class MainActivity extends Activity implements CustomWebView.Listener {
         mWebView.loadUrl("javascript:function loadData(str) { var element = document.getElementById('addBarcodeField');" +
                 "element.value = \" \"; \n" +
                 "element.value = str; \n" +
-                "element.onchange(); } ");
+                "window['angularComponentRef'].component.inputBarcode(str);} ");
         mWebView.loadUrl("javascript:function scanBarcode() { app.scanBarcode(); } ");
     }
 
     @Override
     public void onPageFinished(String url) {
         mWebView.loadUrl("javascript:function loadData(str) { var element = document.getElementById('addBarcodeField');" +
-                "element.value = \" \"; \n" +
-                "element.value = str; \n" +
-                "element.onchange(); } ");
+            "element.value = \" \"; \n" +
+            "element.value = str; \n" +
+            "window['angularComponentRef'].component.inputBarcode(str);} ");
         mWebView.loadUrl("javascript:function scanBarcode() { app.scanBarcode(); } ");
         String authCode = getCookie("https://app.boldirect.com", "BOL-auth");
         if (authCode != null) {
