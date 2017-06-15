@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Boldirect</string>
     <string name="no_internet_message">Please connect to the Internet</string>
+    <string name="turn_on_flashlight">Turn On Flash</string>
+    <string name="turn_off_flashlight">Turn Off Flash</string>
 </resources>

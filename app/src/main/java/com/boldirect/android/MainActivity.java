@@ -44,9 +44,9 @@ public class MainActivity extends Activity implements CustomWebView.Listener {
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl("https://dashboard.boldirect.com/")
                 .build();
-
         restApi = retrofit.create(RestApi.class);
         qrScan = new IntentIntegrator(this);
+        qrScan.setCaptureActivity(CustomScannerActivity.class);
         mWebView = (CustomWebView) findViewById(R.id.webview);
         mWebView.setListener(this, this);
         mWebView.loadUrl(url);
@@ -103,7 +103,15 @@ public class MainActivity extends Activity implements CustomWebView.Listener {
             if (result.getContents() == null) {
                 Toast.makeText(this, "Result Not Found", Toast.LENGTH_LONG).show();
             } else {
-                mWebView.loadUrl("javascript:loadData('" + result.getContents() + "')");
+                String contents = result.getContents();
+
+                if (contents.length() > 17) {
+                    contents = contents.replace("I","");
+                    contents = contents.replace("Q","");
+                    contents = contents.replace("O","");
+                }
+
+                mWebView.loadUrl("javascript:loadData('" + contents + "')");
             }
         } else {
             mWebView.onActivityResult(requestCode, resultCode, intent);
